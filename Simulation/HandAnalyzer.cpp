@@ -115,6 +115,7 @@ HandAnalyzer::PokerHand HandAnalyzer::getBestPokerHand(const vector<Card>& cards
                 }
             }
             if(isOk) {
+                reverse(temporaryHand.values.begin(), temporaryHand.values.end());
                 if(lowest == 9) {
                     temporaryHand.rank = HandAnalyzer::HandRank::RoyalFlush;
                 } else {
@@ -214,6 +215,7 @@ HandAnalyzer::PokerHand HandAnalyzer::getBestPokerHand(const vector<Card>& cards
             }
         }
         if(temporaryHand.values.size() == 5) {
+            reverse(temporaryHand.values.begin(), temporaryHand.values.end());
             temporaryHand.rank = HandAnalyzer::HandRank::Straight;
             return temporaryHand;
         }
