@@ -17,7 +17,9 @@ public:
         bool operator<(const PokerHand& other) const;
 
         bool operator==(const PokerHand& other) const;
+
+        friend std::ostream& operator<<(std::ostream& os, const PokerHand& obj);
     };
 
-    PokerHand getBestPokerHand(const vector<Card>& cards);
+    static PokerHand getBestPokerHand(const vector<Card>& cards);
 };

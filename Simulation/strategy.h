@@ -1,6 +1,6 @@
 #include <vector>
 #include <array>
-#include "deck.h"
+#include "Deck.h"
 
 using namespace std;
 

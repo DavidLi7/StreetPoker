@@ -1,3 +1,4 @@
+#include <iostream>
 #include <vector>
 #include <array>
 
@@ -7,60 +8,99 @@ using namespace std;
 
 using Hand = array<std::array<bool, 4>, 13>;
 
-struct HandAnalyzer::PokerHand {
-    HandRank rank;
-    vector<Card> values;
-    vector<Card> kickers;
-
-    bool operator<(const PokerHand& other) const {
-        if(rank < other.rank) {
-            return true;
-        }
-        if(rank > other.rank) {
-            return false;
-        }
-        for(int i = 0; i < values.size(); i++) {
-            if(values[i].rank < other.values[i].rank) {
-                return (int)values[i].rank != 0;
-            }
-            if(values[i].rank > other.values[i].rank) {
-                return (int)other.values[i].rank != 0;
-            }
-        }
-        for(int i = 0; i < kickers.size(); i++) {
-            if(kickers[i].rank < other.kickers[i].rank) {
-                return (int)kickers[i].rank != 0;
-            }
-            if(kickers[i].rank < other.kickers[i].rank) {
-                return (int)other.kickers[i].rank != 0;
-            }
-        }
-        return false;
+std::ostream& operator<<(std::ostream& os, const HandAnalyzer::PokerHand& obj) {
+    switch((int)obj.rank) {
+        case (int)HandAnalyzer::HandRank::RoyalFlush:
+            os << "Royal Flush\n";
+            break;
+        case (int)HandAnalyzer::HandRank::StraightFlush:
+            os << "Straight Flush\n";
+            break;
+        case (int)HandAnalyzer::HandRank::FourOfAKind:
+            os << "Four of a Kind\n";
+            break;
+        case (int)HandAnalyzer::HandRank::FullHouse:
+            os << "Full House\n";
+            break;
+        case(int) HandAnalyzer::HandRank::Flush:
+            os << "Flush\n";
+            break;
+        case (int)HandAnalyzer::HandRank::Straight:
+            os << "Straight\n";
+            break;
+        case (int)HandAnalyzer::HandRank::ThreeOfAKind:
+            os << "Three of a Kind\n";
+            break;
+        case (int)HandAnalyzer::HandRank::TwoPairs:
+            os << "Two Pair\n";
+            break;
+        case (int)HandAnalyzer::HandRank::OnePair:
+            os << "One Pair\n";
+            break;
+        case (int)HandAnalyzer::HandRank::HighCard:
+            os << "High Card\n";
+            break;
     }
+    os << "Values: ";
+    for(Card card: obj.values) {
+        cout << card << ", ";
+    }
+    os << "\n";
+    os << "Kickers: ";
+    for(Card card: obj.kickers) {
+        cout << card << ", ";
+    }
+    os << "\n";
+    return os;
+}
 
-    bool operator==(const PokerHand& other) const {
-        if(rank != other.rank) {
-            return false;
-        }
-        for(int i = 0; i < values.size(); i++) {
-            if(values[i].rank != other.values[i].rank) {
-                return false;
-            }
-        }
-        for(int i = 0; i < kickers.size(); i++) {
-            if(kickers[i].rank != other.kickers[i].rank) {
-                return false;
-            }
-        }
+bool HandAnalyzer::PokerHand::operator<(const PokerHand& other) const {
+    if(rank < other.rank) {
         return true;
     }
-};
+    if(rank > other.rank) {
+        return false;
+    }
+    for(int i = 0; i < values.size(); i++) {
+        if(values[i] != other.values[i]) {
+            return values[i] < other.values[i];
+        }
+    }
+    for(int i = 0; i < kickers.size(); i++) {
+        if(kickers[i] != other.kickers[i]) {
+            return kickers[i] < other.kickers[i];
+        }
+    }
+    return false;
+}
 
-HandAnalyzer::PokerHand getBestPokerHand(const vector<Card>& cards) {
+bool HandAnalyzer::PokerHand::operator==(const PokerHand& other) const {
+    if(rank != other.rank) {
+        return false;
+    }
+    for(int i = 0; i < values.size(); i++) {
+        if(values[i].rank != other.values[i].rank) {
+            return false;
+        }
+    }
+    for(int i = 0; i < kickers.size(); i++) {
+        if(kickers[i].rank != other.kickers[i].rank) {
+            return false;
+        }
+    }
+    return true;
+}
+
+HandAnalyzer::PokerHand HandAnalyzer::getBestPokerHand(const vector<Card>& cards) {
 
     Hand hand;
+    for(int i = 0; i < 13; i++) {
+        for(int j = 0; j < 4; j++) {
+            hand[i][j] = false;
+        }
+    }
     for(Card card: cards) {
-        hand[(int)card.suit][(int)card.rank] = true;
+        hand[(int)card.rank][(int)card.suit] = true;
     }
 
     //check for royal/straight flush
@@ -69,9 +109,9 @@ HandAnalyzer::PokerHand getBestPokerHand(const vector<Card>& cards) {
             HandAnalyzer::PokerHand temporaryHand;
             bool isOk = true;
             for(int rank = lowest; rank < lowest + 5 && isOk; rank++) {
-                isOk &= hand[suit][rank % 13];
+                isOk &= hand[rank % 13][suit];
                 if(isOk) {
-                    temporaryHand.values.push_back({(Rank)(rank % 13), (Suit)suit});
+                    temporaryHand.values.push_back((Card){(Rank)(rank % 13), (Suit)suit});
                 }
             }
             if(isOk) {
@@ -90,17 +130,17 @@ HandAnalyzer::PokerHand getBestPokerHand(const vector<Card>& cards) {
         HandAnalyzer::PokerHand temporaryHand;
         bool isOk = true;
         for(int suit = 0; suit < 4 && isOk; suit++) {
-            isOk &= hand[suit][rank % 13];
+            isOk &= hand[rank % 13][suit];
             if(isOk) {
-                temporaryHand.values.push_back({(Rank)(rank % 13), (Suit)suit});
+                temporaryHand.values.push_back((Card){(Rank)(rank % 13), (Suit)suit});
             }
         }
         if(isOk) {
             temporaryHand.rank = HandAnalyzer::HandRank::FourOfAKind;
             for(int rank2 = 13; rank2 >= 1; rank2--) if(rank != rank2){
                 for(int suit = 0; suit < 4; suit++) {
-                    if(hand[suit][rank2 % 13]) {
-                        temporaryHand.kickers.push_back({(Rank)(rank2 % 13), (Suit)suit});
+                    if(hand[rank2 % 13][suit]) {
+                        temporaryHand.kickers.push_back((Card){(Rank)(rank2 % 13), (Suit)suit});
                         return temporaryHand;
                     }
                 }
@@ -113,8 +153,8 @@ HandAnalyzer::PokerHand getBestPokerHand(const vector<Card>& cards) {
     for(int rank1 = 13; rank1 >= 1; rank1--) {
         vector<Card> instances;
         for(int suit = 0; suit < 4; suit++) {
-            if(hand[suit][rank1 % 13]) {
-                instances.push_back({(Rank)(Rank)(rank1 % 13), (Suit)suit});
+            if(hand[rank1 % 13][suit]) {
+                instances.push_back((Card){(Rank)(rank1 % 13), (Suit)suit});
             }
         }
         if(instances.size() != 3)
@@ -122,8 +162,8 @@ HandAnalyzer::PokerHand getBestPokerHand(const vector<Card>& cards) {
         for(int rank2 = 13; rank2 >= 1; rank2--) if(rank1 != rank2) {
             vector<Card> instances2;
             for(int suit = 0; suit < 4; suit++) {
-                if(hand[suit][rank2 % 13]) {
-                    instances2.push_back({(Rank)(rank2 % 13), (Suit)suit});
+                if(hand[rank2 % 13][suit]) {
+                    instances2.push_back((Card){(Rank)(rank2 % 13), (Suit)suit});
                     if(instances2.size() == 2)
                         break;
                 }
@@ -145,8 +185,8 @@ HandAnalyzer::PokerHand getBestPokerHand(const vector<Card>& cards) {
         for(int suit = 0; suit < 4; suit++) {
             HandAnalyzer::PokerHand temporaryHand;
             for(int rank = 13; rank >= 1; rank--) {
-                if(hand[suit][rank % 13]) {
-                    temporaryHand.values.push_back({(Rank)(rank % 13), (Suit)suit});
+                if(hand[rank % 13][suit]) {
+                    temporaryHand.values.push_back((Card){(Rank)(rank % 13), (Suit)suit});
                     if(temporaryHand.values.size() == 5) {
                         break;
                     }
@@ -167,8 +207,8 @@ HandAnalyzer::PokerHand getBestPokerHand(const vector<Card>& cards) {
         HandAnalyzer::PokerHand temporaryHand;
         for(int rank = lowest; rank < lowest + 5; rank++) {
             for(int suit = 0; suit < 4; suit++) {
-                if(hand[suit][rank % 13]) {
-                    temporaryHand.values.push_back({(Rank)(rank % 13), (Suit)suit});
+                if(hand[rank % 13][suit]) {
+                    temporaryHand.values.push_back((Card){(Rank)(rank % 13), (Suit)suit});
                     break;
                 }
             }
@@ -183,16 +223,16 @@ HandAnalyzer::PokerHand getBestPokerHand(const vector<Card>& cards) {
     //check for three of a kind
     for(int rank = 13; rank >= 1; rank--) {
         HandAnalyzer::PokerHand temporaryHand;
-        for(int suit = 0; suit < 4; suit++) {
-            temporaryHand.values.push_back({(Rank)rank, (Suit)suit});
+        for(int suit = 0; suit < 4; suit++) if(hand[rank % 13][suit]){
+            temporaryHand.values.push_back((Card){(Rank)rank, (Suit)suit});
         }
         if(temporaryHand.values.size() != 3) 
             continue;
         temporaryHand.rank = HandAnalyzer::HandRank::ThreeOfAKind;
         for(int rank2 = 13; rank2 >= 1; rank2--) if(rank != rank2){
             for(int suit = 0; suit < 4; suit++) {
-                if(hand[suit][rank2 % 13]) {
-                    temporaryHand.kickers.push_back({(Rank)(rank2 % 13), (Suit)suit});
+                if(hand[rank2 % 13][suit]) {
+                    temporaryHand.kickers.push_back((Card){(Rank)(rank2 % 13), (Suit)suit});
                     if(temporaryHand.kickers.size() == 2) {
                         return temporaryHand;
                     }
@@ -206,8 +246,8 @@ HandAnalyzer::PokerHand getBestPokerHand(const vector<Card>& cards) {
     for(int rank1 = 13; rank1 >= 1; rank1--) {
         vector<Card> instances;
         for(int suit = 0; suit < 4; suit++) {
-            if(hand[suit][rank1 % 13]) {
-                instances.push_back({(Rank)(Rank)(rank1 % 13), (Suit)suit});
+            if(hand[rank1 % 13][suit]) {
+                instances.push_back((Card){(Rank)(rank1 % 13), (Suit)suit});
             }
         }
         if(instances.size() != 2)
@@ -215,8 +255,8 @@ HandAnalyzer::PokerHand getBestPokerHand(const vector<Card>& cards) {
         for(int rank2 = 13; rank2 >= 1; rank2--) if(rank1 != rank2) {
             vector<Card> instances2;
             for(int suit = 0; suit < 4; suit++) {
-                if(hand[suit][rank2 % 13]) {
-                    instances2.push_back({(Rank)(rank2 % 13), (Suit)suit});
+                if(hand[rank2 % 13][suit]) {
+                    instances2.push_back((Card){(Rank)(rank2 % 13), (Suit)suit});
                     if(instances2.size() == 2)
                         break;
                 }
@@ -228,8 +268,8 @@ HandAnalyzer::PokerHand getBestPokerHand(const vector<Card>& cards) {
                 temporaryHand.values.insert(temporaryHand.values.end(), instances2.begin(), instances2.end());
                 for(int rank3 = 13; rank3 >= 1; rank3--) if(rank3 != rank2 && rank3 != rank1){
                     for(int suit = 0; suit < 4; suit++) {
-                        if(hand[suit][rank3 % 13]) {
-                            temporaryHand.kickers.push_back({(Rank)(rank3 % 13), (Suit)suit});
+                        if(hand[rank3 % 13][suit]) {
+                            temporaryHand.kickers.push_back((Card){(Rank)(rank3 % 13), (Suit)suit});
                             return temporaryHand;
                             
                         }
@@ -244,15 +284,15 @@ HandAnalyzer::PokerHand getBestPokerHand(const vector<Card>& cards) {
     for(int rank = 13; rank >= 1; rank--) {
         HandAnalyzer::PokerHand temporaryHand;
         for(int suit = 0; suit < 4; suit++) {
-            temporaryHand.values.push_back({(Rank)rank, (Suit)suit});
+            temporaryHand.values.push_back((Card){(Rank)rank, (Suit)suit});
         }
         if(temporaryHand.values.size() != 2) 
             continue;
         temporaryHand.rank = HandAnalyzer::HandRank::ThreeOfAKind;
         for(int rank2 = 13; rank2 >= 1; rank2--) if(rank != rank2){
             for(int suit = 0; suit < 4; suit++) {
-                if(hand[suit][rank2 % 13]) {
-                    temporaryHand.kickers.push_back({(Rank)(rank2 % 13), (Suit)suit});
+                if(hand[rank2 % 13][suit]) {
+                    temporaryHand.kickers.push_back((Card){(Rank)(rank2 % 13), (Suit)suit});
                     if(temporaryHand.kickers.size() == 3) {
                         return temporaryHand;
                     }
@@ -267,8 +307,8 @@ HandAnalyzer::PokerHand getBestPokerHand(const vector<Card>& cards) {
     temporaryHand.rank = HandAnalyzer::HandRank::HighCard;
     for(int rank = 13; rank >= 1; rank--){
         for(int suit = 0; suit < 4; suit++) {
-            if(hand[suit][rank % 13]) {
-                temporaryHand.kickers.push_back({(Rank)(rank % 13), (Suit)suit});
+            if(hand[rank % 13][suit]) {
+                temporaryHand.kickers.push_back((Card){(Rank)(rank % 13), (Suit)suit});
                 if(temporaryHand.kickers.size() == 5) {
                     return temporaryHand;
                 }

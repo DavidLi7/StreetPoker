@@ -1,5 +1,7 @@
 #include <vector>
 
+#pragma once
+
 using namespace std;
 
 enum class Rank {
@@ -13,6 +15,11 @@ enum class Suit {
 struct Card {
     Rank rank;
     Suit suit;
+
+    friend std::ostream& operator<<(std::ostream& os, const Card& obj);
+    bool operator<(const Card& other) const;
+    bool operator==(const Card& other) const;
+    bool operator!=(const Card& other) const;
 };
 
 class Deck {
