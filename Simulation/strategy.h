@@ -11,5 +11,5 @@ bool ruleSatisfied(SimulationRule rule, Card card);
 class Strategy {
 private:
 public:
-    SimulationRule getAction(vector<Card> houseCards, vector<Card> playerCards);
+    SimulationRule getAction(vector<Card>& houseCards, vector<Card>& playerCards) const;
 };

@@ -27,6 +27,6 @@ int main() {
 
     StreetPoker sp;
     Strategy st;
-    cout << sp.simulate(st, 100) << "\n";
+    cout << sp.simulate(st, 1000000) << "\n";
 
 }   

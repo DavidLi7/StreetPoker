@@ -224,7 +224,7 @@ HandAnalyzer::PokerHand HandAnalyzer::getBestPokerHand(const vector<Card>& cards
     for(int rank = 13; rank >= 1; rank--) {
         HandAnalyzer::PokerHand temporaryHand;
         for(int suit = 0; suit < 4; suit++) if(hand[rank % 13][suit]){
-            temporaryHand.values.push_back((Card){(Rank)rank, (Suit)suit});
+            temporaryHand.values.push_back((Card){(Rank)(rank % 13), (Suit)suit});
         }
         if(temporaryHand.values.size() != 3) 
             continue;
@@ -283,12 +283,12 @@ HandAnalyzer::PokerHand HandAnalyzer::getBestPokerHand(const vector<Card>& cards
     //check for pair
     for(int rank = 13; rank >= 1; rank--) {
         HandAnalyzer::PokerHand temporaryHand;
-        for(int suit = 0; suit < 4; suit++) {
-            temporaryHand.values.push_back((Card){(Rank)rank, (Suit)suit});
+        for(int suit = 0; suit < 4; suit++) if(hand[rank % 13][suit]){
+            temporaryHand.values.push_back((Card){(Rank)(rank % 13), (Suit)suit});
         }
         if(temporaryHand.values.size() != 2) 
             continue;
-        temporaryHand.rank = HandAnalyzer::HandRank::ThreeOfAKind;
+        temporaryHand.rank = HandAnalyzer::HandRank::OnePair;
         for(int rank2 = 13; rank2 >= 1; rank2--) if(rank != rank2){
             for(int suit = 0; suit < 4; suit++) {
                 if(hand[rank2 % 13][suit]) {

@@ -21,7 +21,7 @@ std::ostream& operator<<(std::ostream& os, const Card& obj) {
             os << "A";
             break;
         default:
-            os << (int)obj.rank;
+            os << (int)obj.rank + 1;
     }
     os << ", " << (int)obj.suit << ")";
     return os;
