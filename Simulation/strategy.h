@@ -4,7 +4,7 @@
 
 using namespace std;
 
-using SimulationRule = std::array<std::array<bool, 4>, 13>;
+using SimulationRule = array<array<bool, 4>, 13>;
 
 bool ruleSatisfied(SimulationRule rule, Card card);
 

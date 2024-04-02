@@ -5,8 +5,7 @@
 
 using namespace std;
 
-
-//add try catch
+//Deal until we get to next card
 void StreetPoker::simulateRound(Strategy s) {    
     SimulationRule rule = s.getAction(houseCards, playerCards);
     bool finished = false;
@@ -21,6 +20,7 @@ void StreetPoker::simulateRound(Strategy s) {
     }
 }
 
+//Simulate one entire game
 bool StreetPoker::simulate(Strategy s) {
     reset();
     for(int round = 0; round < 5; round++) 
@@ -52,6 +52,7 @@ bool StreetPoker::simulate(Strategy s) {
 
 StreetPoker::StreetPoker(){}
 
+//Simulate iterations rounds and return the success rate
 double StreetPoker::simulate(Strategy s, int iterations) {
     int playerWins = 0;
     for(int iterationCount = 0; iterationCount < iterations; iterationCount++) {
