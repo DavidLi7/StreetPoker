@@ -4,7 +4,7 @@
 
 using namespace std;
 
-const int ITERATIONS = 1e6;
+const int ITERATIONS = 1e5;
 
 int main() {
 

@@ -46,7 +46,6 @@ bool StreetPoker::simulate(Strategy s) {
     // cout << "\n";
     // cout << playerHand;
 
-    
     return houseHand < playerHand;
 }
 

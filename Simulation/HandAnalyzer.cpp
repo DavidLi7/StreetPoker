@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <array>
-
+#include <algorithm>
 #include "HandAnalyzer.h"
 
 using namespace std;

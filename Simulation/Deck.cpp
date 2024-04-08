@@ -1,9 +1,13 @@
 #include <iostream>
 #include <vector>
 #include <random>
+#include <algorithm>
 #include "Deck.h"
 
 using namespace std;
+
+std::random_device rd;
+std::mt19937 g(rd());
 
 std::ostream& operator<<(std::ostream& os, const Card& obj) {
     os << "(";
@@ -60,8 +64,7 @@ void Deck::reset() {
             cards.push_back((Card){(Rank)rank, (Suit)suit});
         }
     }
-    std::random_device rd;
-    std::mt19937 g(rd());
+
     std::shuffle(cards.begin(), cards.end(), g);
 }
 
